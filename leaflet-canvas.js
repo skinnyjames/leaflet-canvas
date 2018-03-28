@@ -39,7 +39,7 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   onRemove(map) {
     map.getPanes().overlayPane.removeChild(this._canvas)
     map.off(this.getEvents(), this)
-    this.fire('unmount')
+    this.fire('unmounted')
     this._canvas = null;
   },
 
