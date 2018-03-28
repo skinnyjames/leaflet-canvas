@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/random-location/dist/randomLocation.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+    <script src="/dist/leaflet-canvas.js"></script>
+    <style>
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+    window.onload = function() {
+
+      // just to generate random locations
+      let points = [];
+      var point = {
+        latitude: 51.505,
+        longitude: -0.09,
+      };
+      var radius = 5000;
+
+      for (var i=0;i<30000;i++) {
+        let data = randomLocation.randomCirclePoint(point, radius); 
+        data.data = "hello, " + i.toString();
+        points.push(data);
+      }
+
+
+      var map = L.map('map', { center: [51.505, -0.09], zoom: 13, zoomAnimation: false });
+
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      var canvas = new L.CanvasLayer();
+
+      canvas.on('click', function(info) {
+
+        let point = isClicked()
+
+        if (point) {
+          alert(point.data);
+        }
+        function isClicked() {
+          let bounds = info.getBufferedBounds(6)
+          for(let i=0;i<points.length;i++) {
+            if (bounds.contains(L.latLng([points[i].latitude, points[i].longitude]))) {
+              return points[i];
+            }
+          }
+          return false;
+        }
+      })
+
+
+      canvas.on('mousemove', function(info) {
+        let container = document.getElementsByClassName('leaflet-container')[0]
+
+        if (isMoused()) {
+          container.style.cursor = 'crosshair'
+        } else {
+          container.style.cursor = ''
+        }
+
+        function isMoused() {
+          let bounds = info.getBufferedBounds(6)
+          for(let i=0;i<points.length;i++) {
+            if (bounds.contains(L.latLng([points[i].latitude, points[i].longitude]))) {
+              return true        
+            }
+          }
+          return false
+        }
+      })
+      
+      canvas.on('zoom', function(info) {
+        canvas.draw()  
+      })
+
+      canvas.on('drawing', function(info) {
+        console.log('drawing')
+        var canvas = info.canvas;
+        var ctx = canvas.getContext('2d');
+       
+        //clear current drawing
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgb(106, 158, 242)";
+        
+        
+        var firstDot = info.layer._map.latLngToContainerPoint([points[0].latitude, points[0].longitude]);
+
+
+        for (var i=0;i<points.length;i++) {
+          var bounds = info.layer._map.getBounds()
+          if(bounds.contains(L.latLng([points[i].latitude, points[i].longitude]))) {
+            var dot = info.layer._map.latLngToContainerPoint([points[i].latitude, points[i].longitude]);
+            ctx.beginPath();
+            ctx.arc(dot.x, dot.y, 3, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.closePath()
+          }
+        }
+        info.layer.fire('zoom');
+      })
+      
+      map.addLayer(canvas)
+    }
+  </script> 
+</html>
