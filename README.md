@@ -12,6 +12,7 @@ npm install
 npm run build
 npm run dev
 
+check out http://localhost:8080
 ```
 
 ### api
