@@ -3,6 +3,13 @@
 a canvas layer for leaflet maps
 derived from [Sumbera/gLayers.Leaflet](http://github.com/Sumbera/gLayers.Leaflet)
 
+## usage
+
+```
+npm install @skinnyjames/leaflet-canvas
+
+```
+
 
 ## test it out
 
