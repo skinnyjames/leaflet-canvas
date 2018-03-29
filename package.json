@@ -1,6 +1,6 @@
 {
   "name": "@skinnyjames/leaflet-canvas",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a canvas layer for leaflet",
   "main": "./dist/leaflet-canvas.js",
   "scripts": {
