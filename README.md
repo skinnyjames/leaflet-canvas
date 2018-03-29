@@ -11,9 +11,8 @@ git clone git@github.com:skinnyjames/leaflet-canvas.git
 npm install 
 npm run build
 npm run dev
-
-check out http://localhost:8080
 ```
+check out http://localhost:8080
 
 ### api
 
