@@ -46,7 +46,6 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
 
   draw() {
     if (!this._frame) {
-      console.log('requesting animation frame')
       this._frame = L.Util.requestAnimFrame(this.drawLayer, this)
     }
     return this;
