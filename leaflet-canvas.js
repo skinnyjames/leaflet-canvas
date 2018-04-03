@@ -27,6 +27,9 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     this._canvas.width = size.x
     this._canvas.height = size.y
 
+    var originProp = L.DomUtil.testProp(['transformOrigin', 'WebkitTransformOrigin', 'msTransformOrigin']);
+    this._canvas.style[originProp] = '50% 50%';
+
     var animated = this._map.options.zoomAnimation && L.Browser.any3d
     L.DomUtil.addClass(this._canvas, 'leaflet-zoom-' + (animated ? 'animated' : 'hide'))
 
@@ -54,8 +57,7 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   drawLayer() {
     let size   = this._map.getSize();
     let bounds = this._map.getBounds();
-    let zoom   = this._map.getZoom();
-
+    let zoom   = this._map.getZoom(); 
     let center = this.LatLonToMercator(this._map.getCenter());
     let corner = this.LatLonToMercator(this._map.containerPointToLatLng(this._map.getSize()))
 
@@ -69,15 +71,33 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
       corner: corner
     }
 
+    this.resetSize()
     this.fire('drawing', data)
 
     this._frame = null;
   },
 
+  resetSize() {
+
+    //clear current drawing
+    var ctx = this._canvas.getContext('2d');
+    ctx.clearRect(0,0, this._canvas.width, this._canvas.height);
+
+    var topLeft = this._map.containerPointToLayerPoint([0, 0])
+    L.DomUtil.setPosition(this._canvas, topLeft)
+    var size = this._map.getSize();
+
+    if (this._canvas.width !== size.x) {
+      this._canvas.width = size.x;
+    }
+    if (this._canvas.height !== size.y) {
+      this._canvas.height = size.y;
+    }
+  },
+
   getEvents() {
 
     let self = this
-    var lastClick = null
 
     let events = {
       click:     dispatch('click'),
@@ -90,7 +110,7 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     }
 
     if (this._map.options.zoomAnimation && L.Browser.any3d) {
-        events.zoomanim =  this._animateZoom
+      this.zoomanim = self._animateZoom
     }
 
     return events
@@ -98,13 +118,9 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     function dispatch(eventName) {
 
       return function(e) {
-        if (eventName == 'moveend' || eventName == 'move') {
-          if (self._canvas) {
-            var topLeft = self._map.containerPointToLayerPoint([0, 0])
-            L.DomUtil.setPosition(self._canvas, topLeft)
-          }
+        if (eventName == 'moveend') {
+          self.draw()
         }
-
         if (eventName == 'click' || eventName == 'mousemove') {
           e.getBufferedBounds = getBufferedBounds
         } 
@@ -164,6 +180,10 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
       } else {
         offset = this._map._getCenterOffset(e.center)._multiplyBy(-scale).subtract(this._map._getMapPanePos());
       }
-      L.DomUtil.setTransform(this._canvas, offset, scale);
+      if (L.DomUtil.setTransform) {
+        L.DomUtil.setTransform(this._canvas, offset, scale);
+      } else {
+        this._canvas.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(offset) + ' scale(' + scale + ')';
+      }
   },
 })

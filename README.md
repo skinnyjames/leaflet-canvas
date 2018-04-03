@@ -23,7 +23,7 @@ check out http://localhost:8080
 
 ### api
 
-`draw` -> draws the canvas layer
+`draw` -> redraws the canvas layer
 
 ### events
 
