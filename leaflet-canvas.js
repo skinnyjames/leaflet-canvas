@@ -98,12 +98,11 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     function dispatch(eventName) {
 
       return function(e) {
-        if (eventName == 'moveend') {
+        if (eventName == 'moveend' || eventName == 'move') {
           if (self._canvas) {
             var topLeft = self._map.containerPointToLayerPoint([0, 0])
             L.DomUtil.setPosition(self._canvas, topLeft)
           }
-          self.draw()
         }
 
         if (eventName == 'click' || eventName == 'mousemove') {
