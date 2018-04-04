@@ -25,14 +25,14 @@
       };
       var radius = 5000;
 
-      for (var i=0;i<10000;i++) {
+      for (var i=0;i<30000;i++) {
         let data = randomLocation.randomCirclePoint(point, radius); 
         data.data = "hello, " + i.toString();
         points.push(data);
       }
 
 
-      var map = L.map('map', { center: [51.505, -0.09], zoom: 13, zoomAnimation: false });
+      var map = L.map('map', { center: [51.505, -0.09], zoom: 13, zoomAnimation: true });
 
       L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',

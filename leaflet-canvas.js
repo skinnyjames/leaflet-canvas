@@ -27,13 +27,14 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     this._canvas.width = size.x
     this._canvas.height = size.y
 
-    var originProp = L.DomUtil.testProp(['transformOrigin', 'WebkitTransformOrigin', 'msTransformOrigin']);
-    this._canvas.style[originProp] = '50% 50%';
-
     var animated = this._map.options.zoomAnimation && L.Browser.any3d
     L.DomUtil.addClass(this._canvas, 'leaflet-zoom-' + (animated ? 'animated' : 'hide'))
 
     this._map._panes.overlayPane.appendChild(this._canvas)
+
+    if (this._map.options.zoomAnimation && L.Browser.any3d) {
+      this._map.on('zoomanim', self._animateZoom, self)
+    }
     
     this.fire('mounted', {map: this._map, canvas: this._canvas})  
     this.draw()
@@ -42,6 +43,11 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   onRemove(map) {
     map.getPanes().overlayPane.removeChild(this._canvas)
     map.off(this.getEvents(), this)
+
+    if (this._map.options.zoomAnimation) {
+      this._map.off('zoomanim', this._animateZoom, this)
+    }
+
     this.fire('unmounted')
     this._canvas = null;
   },
